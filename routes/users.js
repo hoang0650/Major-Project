@@ -12,9 +12,7 @@ router.post("/",async (req,res)=>{
 
 		//validation
 
-		if(!email || !password || !passwordVerify)
-			return 
-				res.status(400).json({errorMessage:"Please enter all required fields."});
+		
 		if(password.length < 6)
 			return res.status(400).json({errorMessage:"Please enter at least 6 characters."});
 		if(password !== passwordVerify)
@@ -26,6 +24,10 @@ router.post("/",async (req,res)=>{
 				errorMessage: "An account with this email already exists."
 			});
 
+			if(!email || !password || !passwordVerify)
+			{ res.status(400).json({errorMessage:"Please enter all required fields."});
+			}else{ res.status(200).json('Your Register Successfully!!!').send();}
+			
 		//hash the password
 		const salt = await bcrypt.genSalt();
 		const passwordHash = await bcrypt.hash(password,salt);
@@ -51,11 +53,11 @@ router.post("/",async (req,res)=>{
 		res.cookie("token",token,{
 			httpOnly:true,
 			secure:true,
-			sameSite:"none",
+			sameSite:"lax",
 		});
-	}catch(err){
-		console.log(err);
-		res.status(500).send();
+	}catch(err) {
+		console.error(err);
+	  	res.status(500).send();
 	}
 
 });
@@ -83,7 +85,10 @@ router.post("/login", async (req, res) => {
 	  );
 	  if (!passwordCorrect)
 		return res.status(401).json({ errorMessage: "Wrong email or password." });
-  
+
+	  if(passwordCorrect)
+		return res.status(200).json('Your Login Successfully!!!');
+		
 	  // sign the token
   
 	  const token = jwt.sign(
@@ -102,9 +107,9 @@ router.post("/login", async (req, res) => {
 		  sameSite: "none",
 		})
 		.send();
-	} catch (err) {
-	  console.error(err);
-	  res.status(500).send();
+	} catch(err) {
+		console.error(err);
+	  	res.status(500).send();
 	}
   });
   
@@ -127,7 +132,7 @@ router.post("/login", async (req, res) => {
 	  jwt.verify(token, process.env.JWT_SECRET);
   
 	  res.send(true);
-	} catch (err) {
+	} catch(err) {
 	  res.json(false);
 	}
   });
