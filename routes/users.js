@@ -53,7 +53,7 @@ router.post("/",async (req,res)=>{
 		res.cookie("token",token,{
 			httpOnly:true,
 			secure:true,
-			sameSite:"lax",
+			sameSite:"none",
 		});
 	}catch(err) {
 		console.error(err);
