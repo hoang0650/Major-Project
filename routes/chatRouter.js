@@ -1,22 +1,8 @@
 const router = require('express').Router();
-const Chat = require('../models/chat');
-const auth = require('../middleware/auth');
+const {getMsg,sendMsg,deleteMsg,updateMsg} = require('../controller/chat-controller');
 
-router.post('/',async(req,res)=>{
-	try {
-		const {sender,message}= req.body;
-
-		const  newChat= new Chat({
-			sender,message
-		});
-
-		const savedChat = await newChat.save();
-
-		res.json(savedChat);
-	} catch (error) {
-		console.error(err);
-		res.status(500).send();
-	}
-});
-
+router.get('/',getMsg);
+router.post('/send',sendMsg);
+router.get('/delete/:id',deleteMsg);
+router.get('/update/:id',updateMsg);
 module.exports = router;
