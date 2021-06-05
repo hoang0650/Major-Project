@@ -4,45 +4,76 @@ const jwt = require('jsonwebtoken');
 
  const signup = async (req,res,next)=>{
     try {
-        const {userName,email,passwordHash,passwordVerify}=req.body;
+        const {userName,email,passwordHashh,passwordVerify}=req.body;
 
-        if(!userName || !email || ! passwordHash || !passwordVerify)
+        if(!userName || !email || ! passwordHashh || !passwordVerify)
             return res
                 .status(400)
-                .json('Please enter all require fields.');
-        if(passwordHash.length < 6)
+                .json('Please enter all require fields.'+userName+email+passwordHashh+passwordVerify);
+        if(passwordHashh.length < 6)
             return res
                 .status(400).json('Please enter at least 6 characters.');
-        if(passwordHash !== passwordVerify)
+        if(passwordHashh !== passwordVerify)
             return res
                 .status(400)
                 .json('Please enter the same password twice.');
         const existingUser = await User.findOne({email});
         if(existingUser)
             return res.status(400).json('An account with this email exists.');
-        const salt = await bcrypt.genSalt();
-        const password = await bcrypt.hash(passwordHash,salt);
 
+        //salt
+        var salt;
+        try{
+          salt = await bcrypt.genSalt();
+          // console.log(salt);
+        }
+        catch(error){
+          console.log(error);
+        }
+        // console.error("loi roi1");
+
+
+
+        const passwordHash = await bcrypt.hash(passwordHashh,salt);
+        // console.error("loi roi2");
+        // console.log(userName+"/"+email+"/"+passwordHash);
+        
         const newUser = new User({
-            userName,email,password
+            userName,email,passwordHash
         })
-        const savedUser = await newUser.save();
+        // console.log(newUser);
+        // console.error("loi roi3");
 
+        //save user
+        var savedUser;
+
+        try{
+          savedUser = await newUser.save();
+        }
+        catch(error){
+          console.log(error);
+        }
+        // console.error("loi roi4");
+
+        
         const token = jwt.sign({
             user: savedUser._id
         },
-        process.env.JWT_SECRET
-        );
+          process.env.JWT_SECRET
+          );
+        // console.error("loi roi5");
 
-        res.cookie("token",token,{httpOnly:true,secure:true,sameSite:'none'})
+        res.cookie("token",token,{httpOnly:true,secure:true,sameSite:'strict'})
             .status(201).json({
                 Message: 'Sign up successfull!!!',
                 user: savedUser.toObject({getters:true})
             })
-    } catch (error) {
-        console.error(err);
+      } catch (error) {
+        // console.error("loi roi");
+
+        console.error(error);
         res.status(500).send();
-    }
+      }
 };
 
 const login = async (req, res, next) => {
@@ -57,13 +88,17 @@ const login = async (req, res, next) => {
       const existingUser = await User.findOne({ email });
       if (!existingUser)
         return res.status(401).json("Wrong email or password.");
-  
+      
+      
+
       const passwordCorrect = await bcrypt.compare(
         passwordHash,
-        existingUser.password
+        existingUser.passwordHash
       );
+
       if (!passwordCorrect)
         return res.status(401).json("Wrong email or password.");
+
       const token = jwt.sign(
         {
           user: existingUser._id,
@@ -71,17 +106,17 @@ const login = async (req, res, next) => {
         process.env.JWT_SECRET
       );
   
-      res
-        .cookie("token", token, {
+      res.cookie("token", token, {
           httpOnly: true,
           secure: true,
-          sameSite: "none",
+          sameSite: "strict",
         })
         .status(202)
         .json({
           Message: "Sign in successfull.",
           user: existingUser.toObject({ getters: true }),
         });
+
     } catch (err) {
       console.error(err);
       res.status(500).send();

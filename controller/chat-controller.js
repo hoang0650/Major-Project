@@ -3,7 +3,14 @@ const Chat = require('../models/chat');
 //Get All Message
 const getMsg = async(req,res)=>{
     try {
-        const chats = await Chat.find();
+        const {userID, roomID}=req.body;
+
+        if(!roomID || !userID)
+            return res
+                .status(400)
+                .json('Please enter all require fields.');
+
+        const chats = await Chat.find({userID:userID, roomID:roomID});
         res.json({chats});
     } catch (error) {
         return res.status(500).json({msg: err.message});

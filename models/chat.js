@@ -1,16 +1,15 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const chatSchema = new Schema({
-    sender: {
+    roomID: {
+        type: String
+    },
+    userID: {
         type: String
     },
     message: {
-        type: String
+        type: String  
     },
-    // avatar: {
-    //     type: String,
-    //     required: true
-    // }
 },{
     timestamps: true
 });

@@ -10,7 +10,13 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var chatRouter = require('./routes/chatRouter');
 var chatRoomRouter = require('./routes/chatRoomRouter');
-var corsOptions={origin:'htpp://localhost:4200'};
+var roomRouter = require('./routes/roomRouter');
+var participantRouter = require('./routes/participantRouter');
+
+
+
+
+// var corsOptions={origin:'htpp://localhost:4200'};
 var dotenv = require('dotenv');
 dotenv.config();
 
@@ -36,6 +42,15 @@ const pusher = new Pusher({
 
 var app = express();
 
+//socket.io
+
+
+//Cors enable
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -46,7 +61,8 @@ app.use(session({
   resave: true,
   saveUninitialized: true
 }))
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
+app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -56,6 +72,8 @@ app.use(cookieParser());
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/chat', chatRouter);
+app.use('/room', roomRouter);
+app.use('/parti', participantRouter);
 app.use('/chatRoom',chatRoomRouter);
 
 app.use(express.static(path.join(__dirname, 'public')));
