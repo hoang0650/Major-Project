@@ -1,6 +1,7 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
+var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
@@ -13,7 +14,7 @@ var chatRoomRouter = require('./routes/chatRoomRouter');
 var roomRouter = require('./routes/roomRouter');
 var participantRouter = require('./routes/participantRouter');
 
-
+const profilesRoutes = require('./routes/profiles');
 
 
 // var corsOptions={origin:'htpp://localhost:4200'};
@@ -22,6 +23,7 @@ dotenv.config();
 
 // connect to mongodb
 const mongoose = require('mongoose');
+const { appendFileSync } = require('fs');
 mongoose.connect(process.env.MDB_CONNECT,{
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -63,6 +65,7 @@ app.use(session({
 }))
 // app.use(cors(corsOptions));
 app.use(cors());
+app.use(bodyParser.json());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -75,6 +78,8 @@ app.use('/chat', chatRouter);
 app.use('/room', roomRouter);
 app.use('/parti', participantRouter);
 app.use('/chatRoom',chatRoomRouter);
+app.use('/images',express.static(path.join('images')));
+app.use('/api/profiles', profilesRoutes);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
