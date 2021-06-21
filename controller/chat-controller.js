@@ -3,14 +3,14 @@ const Chat = require('../models/chat');
 //Get All Message
 const getMsg = async(req,res)=>{
     try {
-        const {userID, roomID}=req.body;
+        const {roomID}=req.body;
 
-        if(!roomID || !userID)
+        if(!roomID)
             return res
                 .status(400)
                 .json('Please enter all require fields.');
 
-        const chats = await Chat.find({userID:userID, roomID:roomID});
+        const chats = await Chat.find({roomID:roomID});
         res.json({chats});
     } catch (error) {
         return res.status(500).json({msg: err.message});
@@ -20,8 +20,8 @@ const getMsg = async(req,res)=>{
 //Send Message
 const sendMsg = async (req,res)=>{
     try {
-        const {sender,message} = req.body;
-        const newChat = new Chat({sender,message});
+        const {roomID, userID, message} = req.body;
+        const newChat = new Chat({roomID, userID, message});
         await newChat.save();
         res.json('Message sent');
     } catch (error) {

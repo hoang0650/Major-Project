@@ -48,6 +48,7 @@ const deleteParticipant = async(req,res)=>{
     }
 };
 
+
 module.exports = {getParticipant,createParticipant,updateParticipant,deleteParticipant};
 
 
