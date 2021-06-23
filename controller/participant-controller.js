@@ -1,4 +1,8 @@
 const Parti = require('../models/participant');
+const User = require('../models/user');
+const Room = require('../models/room');
+const mongoose = require("mongoose");
+
 
 //Get All Message
 const getParticipant = async(req,res)=>{
@@ -24,7 +28,7 @@ const getParticipant = async(req,res)=>{
 
 const createParticipant = async(req,res)=>{
     try {
-        return res.json("create Parti work!")
+        return res.json("create Parti work!");
     } catch (error) {
         return res.status(500).json({msg: err.message});
     }
